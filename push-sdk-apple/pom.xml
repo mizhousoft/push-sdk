@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.mizhousoft.sdk</groupId>
+		<artifactId>push-sdk</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>push-sdk-apple</artifactId>
+	<packaging>jar</packaging>
+	<name>push-sdk-apple</name>
+	<description></description>
+
+	<properties>
+		<maven.deploy.skip>true</maven.deploy.skip>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.mizhousoft.sdk</groupId>
+			<artifactId>push-sdk-common</artifactId>
+			<version>${push.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.eatthepath</groupId>
+			<artifactId>pushy</artifactId>
+			<version>${pushy.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

@@ -1,0 +1,18 @@
+.settings
+.project
+target
+.classpath
+pkg
+/.metadata/
+.factorypath
+.springBeans
+.idea
+*.iml
+.DS_Store
+dependency-reduced-pom.xml
+
+# Dependency directories
+node_modules
+dist
+*.p8
+application.properties
