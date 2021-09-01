@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import com.mizhousoft.push.exception.PushException;
 
@@ -42,7 +42,7 @@ public abstract class PushAsserts
 
 	public static void notEmpty(String value, String message) throws PushException
 	{
-		if (StringUtils.isEmpty(value))
+		if (StringUtils.isBlank(value))
 		{
 			throw new PushException(message);
 		}
