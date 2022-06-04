@@ -124,7 +124,7 @@ public class ApplePushServiceImpl implements ApplePushService
 			}
 			else
 			{
-				String error = response.getRejectionReason();
+				String error = response.getRejectionReason().orElse(null);
 
 				Instant instant = response.getTokenInvalidationTimestamp().orElse(null);
 				if (null != instant)

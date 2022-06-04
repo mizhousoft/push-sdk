@@ -20,7 +20,7 @@
 		<commons.version>1.4.0-SNAPSHOT</commons.version>
 		<push.version>1.4.0-SNAPSHOT</push.version>
 
-		<pushy.version>0.14.2</pushy.version>
+		<pushy.version>0.15.1</pushy.version>
 	</properties>
 
 	<modules>
