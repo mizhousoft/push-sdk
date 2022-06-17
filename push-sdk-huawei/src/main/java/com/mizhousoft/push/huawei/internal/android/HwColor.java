@@ -11,19 +11,19 @@ public class HwColor
 {
 	// RGB颜色中的alpha设置，默认值为1，取值范围[0,1]。
 	@JsonProperty("alpha")
-	private Float alpha = new Float(1.0);
+	private Float alpha = Float.valueOf(1.0f);
 
 	// RGB颜色中的red设置，默认值为0，取值范围[0,1]。
 	@JsonProperty("red")
-	private Float red = new Float(0.0);
+	private Float red = Float.valueOf(0.0f);
 
 	// RGB颜色中的green设置，默认值为0，取值范围[0,1]。
 	@JsonProperty("green")
-	private Float green = new Float(0.0);
+	private Float green = Float.valueOf(0.0f);
 
 	// RGB颜色中的blue设置，默认值为0，取值范围[0,1]。
 	@JsonProperty("blue")
-	private Float blue = new Float(0.0);
+	private Float blue = Float.valueOf(0.0f);
 
 	/**
 	 * 获取alpha
