@@ -6,19 +6,19 @@
 	<parent>
 		<groupId>com.mizhousoft</groupId>
 		<artifactId>mizhousoft</artifactId>
-		<version>1.6.0-SNAPSHOT</version>
+		<version>1.6.0</version>
 	</parent>
 
 	<groupId>com.mizhousoft.sdk</groupId>
 	<artifactId>push-sdk</artifactId>
-	<version>1.5.0-SNAPSHOT</version>
+	<version>1.5.0</version>
 	<packaging>pom</packaging>
 	<name>push-sdk</name>
 	<description>Push SDK</description>
 
 	<properties>
-		<commons.version>1.5.0-SNAPSHOT</commons.version>
-		<push.version>1.5.0-SNAPSHOT</push.version>
+		<commons.version>1.5.0</commons.version>
+		<push.version>1.5.0</push.version>
 
 		<pushy.version>0.15.1</pushy.version>
 	</properties>
