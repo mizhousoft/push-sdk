@@ -16,9 +16,7 @@ public enum PushProvider
     // 小米
 	XIAOMI("xiaomi"),
     // 苹果
-	APPLE("apple"),
-    // 友盟
-	UMENG("umeng");
+	APPLE("apple");
 
 	/**
 	 * 构造函数

@@ -51,11 +51,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.mizhousoft.sdk</groupId>
-			<artifactId>push-sdk-umeng</artifactId>
-			<version>${push.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.mizhousoft.sdk</groupId>
 			<artifactId>push-sdk-union</artifactId>
 			<version>${push.version}</version>
 		</dependency>
@@ -84,7 +79,6 @@
 									<include>com.mizhousoft.sdk:push-sdk-vivo</include>
 									<include>com.mizhousoft.sdk:push-sdk-xiaomi</include>
 									<include>com.mizhousoft.sdk:push-sdk-apple</include>
-									<include>com.mizhousoft.sdk:push-sdk-umeng</include>
 									<include>com.mizhousoft.sdk:push-sdk-union</include>
 								</includes>
 							</artifactSet>

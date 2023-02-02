@@ -44,11 +44,6 @@
 			<artifactId>push-sdk-apple</artifactId>
 			<version>${push.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.mizhousoft.sdk</groupId>
-			<artifactId>push-sdk-umeng</artifactId>
-			<version>${push.version}</version>
-		</dependency>
 	</dependencies>
 
 </project>

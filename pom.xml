@@ -30,7 +30,6 @@
 		<module>push-sdk-oppo</module>
 		<module>push-sdk-xiaomi</module>
 		<module>push-sdk-apple</module>
-		<module>push-sdk-umeng</module>
 		<module>push-sdk-union</module>
 		<module>push-sdk-all</module>
 	</modules>

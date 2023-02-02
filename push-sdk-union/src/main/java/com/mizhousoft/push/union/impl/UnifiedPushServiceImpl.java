@@ -26,8 +26,6 @@ import com.mizhousoft.push.oppo.impl.OppoPushServiceImpl;
 import com.mizhousoft.push.request.MessageRequest;
 import com.mizhousoft.push.request.NotificationRequest;
 import com.mizhousoft.push.result.PushResult;
-import com.mizhousoft.push.umeng.config.UMengProfile;
-import com.mizhousoft.push.umeng.impl.UMengPushServiceImpl;
 import com.mizhousoft.push.union.UnifiedPushService;
 import com.mizhousoft.push.union.util.PushLogger;
 import com.mizhousoft.push.vivo.config.ViVoProfile;
@@ -96,16 +94,6 @@ public class UnifiedPushServiceImpl implements UnifiedPushService
 			pushServiceMap.put(PushProvider.APPLE, applePushService);
 
 			LOG.info("Create Apple push service, app id is {}.", profile.getBundleIdentifier());
-		}
-
-		ProviderProfile umengProfile = profileMap.get(PushProvider.UMENG);
-		if (null != umengProfile)
-		{
-			UMengProfile profile = (UMengProfile) umengProfile;
-			UMengPushServiceImpl umengPushService = new UMengPushServiceImpl(profile, restClientService);
-			pushServiceMap.put(PushProvider.UMENG, umengPushService);
-
-			LOG.info("Create UMeng push service, app id is {}.", profile.getAppId());
 		}
 	}
 
