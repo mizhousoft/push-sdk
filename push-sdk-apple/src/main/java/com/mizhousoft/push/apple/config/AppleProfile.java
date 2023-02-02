@@ -16,7 +16,7 @@ public class AppleProfile extends ProviderProfile
 	private String teamId;
 
 	// Keys Id
-	private String keyId;
+	private volatile String keyId;
 
 	// Keys 证书文件
 	private File pkcs8File;

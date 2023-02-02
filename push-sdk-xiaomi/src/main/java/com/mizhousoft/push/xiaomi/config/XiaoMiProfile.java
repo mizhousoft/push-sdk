@@ -14,7 +14,7 @@ public class XiaoMiProfile extends ProviderProfile
 	private String appId;
 
 	// APP secret
-	private String appSecret;
+	private volatile String appSecret;
 
 	// App的包名，多个以英文逗号拼接
 	private String packageNames;

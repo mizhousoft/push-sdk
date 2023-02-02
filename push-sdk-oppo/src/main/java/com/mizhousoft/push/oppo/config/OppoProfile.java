@@ -14,7 +14,7 @@ public class OppoProfile extends ProviderProfile
 	private String appKey;
 
 	// masterSecret
-	private String masterSecret;
+	private volatile String masterSecret;
 
 	/**
 	 * {@inheritDoc}

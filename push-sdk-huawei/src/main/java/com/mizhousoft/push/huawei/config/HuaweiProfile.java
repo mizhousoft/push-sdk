@@ -14,7 +14,7 @@ public class HuaweiProfile extends ProviderProfile
 	private String appId;
 
 	// appSecret
-	private String appSecret;
+	private volatile String appSecret;
 
 	/**
 	 * {@inheritDoc}
