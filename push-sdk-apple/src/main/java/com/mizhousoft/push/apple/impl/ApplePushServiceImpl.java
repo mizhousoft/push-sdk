@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -27,6 +28,9 @@ import com.mizhousoft.push.exception.PushException;
 import com.mizhousoft.push.request.NotificationRequest;
 import com.mizhousoft.push.result.PushResult;
 import com.mizhousoft.push.validator.RequestValidator;
+
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 
 /**
  * 苹果推送服务
@@ -61,7 +65,7 @@ public class ApplePushServiceImpl implements ApplePushService
 	@Override
 	public boolean isSupportMultiSend()
 	{
-		return false;
+		return true;
 	}
 
 	/**
@@ -72,25 +76,6 @@ public class ApplePushServiceImpl implements ApplePushService
 	{
 		RequestValidator.validate(request);
 
-		Set<String> tokens = request.getTokens();
-		if (tokens.size() != 1)
-		{
-			throw new PushException("Token too many, can not exceed 1.");
-		}
-
-		return sendOneNotification(request, tokens.iterator().next());
-	}
-
-	/**
-	 * 发送单个
-	 * 
-	 * @param request
-	 * @param token
-	 * @return
-	 * @throws PushException
-	 */
-	private PushResult sendOneNotification(NotificationRequest request, String token) throws PushException
-	{
 		try
 		{
 			final ApnsPayloadBuilder payloadBuilder = new SimpleApnsPayloadBuilder();
@@ -106,36 +91,49 @@ public class ApplePushServiceImpl implements ApplePushService
 
 			String topic = profile.getBundleIdentifier();
 
-			SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(token, topic, payload,
-			        Instant.now().plus(SimpleApnsPushNotification.DEFAULT_EXPIRATION_PERIOD), DeliveryPriority.IMMEDIATE, PushType.ALERT,
-			        null, null);
+			Set<String> tokens = request.getTokens();
 
-			PushNotificationFuture<SimpleApnsPushNotification, PushNotificationResponse<SimpleApnsPushNotification>> future = apnsClient
-			        .sendNotification(pushNotification);
+			Set<String> traceIds = new HashSet<>(tokens.size());
+			Set<String> illegalTokens = new HashSet<>(1);
 
-			final PushNotificationResponse<SimpleApnsPushNotification> response = future.get(10, TimeUnit.SECONDS);
+			CountDownLatch countDownLatch = new CountDownLatch(tokens.size());
 
-			LOG.info("Push response is {}.", response);
-
-			String traceId = response.getApnsId().toString();
-			if (response.isAccepted())
+			for (String token : tokens)
 			{
-				return new PushResult(traceId);
-			}
-			else
-			{
-				String error = response.getRejectionReason().orElse(null);
+				SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(token, topic, payload,
+				        Instant.now().plus(SimpleApnsPushNotification.DEFAULT_EXPIRATION_PERIOD), DeliveryPriority.IMMEDIATE,
+				        PushType.ALERT, null, null);
 
-				Instant instant = response.getTokenInvalidationTimestamp().orElse(null);
-				if (null != instant)
-				{
-					error = error + ", token invalidation time is " + instant;
-				}
+				PushNotificationFuture<SimpleApnsPushNotification, PushNotificationResponse<SimpleApnsPushNotification>> future = apnsClient
+				        .sendNotification(pushNotification);
 
-				Set<String> illegalTokens = new HashSet<>(1);
-				illegalTokens.add(token);
-				return new PushResult(traceId, illegalTokens);
+				future.whenComplete((response, cause) -> {
+					countDownLatch.countDown();
+
+					LOG.info("Push response is {}.", response);
+
+					if (response != null)
+					{
+						String traceId = response.getApnsId().toString();
+						traceIds.add(traceId);
+
+						if (!response.isAccepted())
+						{
+							illegalTokens.add(token);
+						}
+					}
+					else
+					{
+						illegalTokens.add(token);
+
+						LOG.error("Push notification failed.", cause);
+					}
+				});
 			}
+
+			countDownLatch.await(10, TimeUnit.SECONDS);
+
+			return new PushResult(traceIds.iterator().next(), illegalTokens);
 		}
 		catch (Exception e)
 		{
@@ -153,8 +151,11 @@ public class ApplePushServiceImpl implements ApplePushService
 		{
 			ApnsSigningKey signingKey = ApnsSigningKey.loadFromPkcs8File(profile.getPkcs8File(), profile.getTeamId(), profile.getKeyId());
 
+			EventLoopGroup eventLoopGroup = new NioEventLoopGroup(4);
+
 			String host = profile.isSandbox() ? ApnsClientBuilder.DEVELOPMENT_APNS_HOST : ApnsClientBuilder.PRODUCTION_APNS_HOST;
-			apnsClient = new ApnsClientBuilder().setApnsServer(host).setSigningKey(signingKey).build();
+			apnsClient = new ApnsClientBuilder().setApnsServer(host).setSigningKey(signingKey).setConcurrentConnections(2)
+			        .setEventLoopGroup(eventLoopGroup).build();
 		}
 		catch (Throwable e)
 		{
