@@ -1,10 +1,10 @@
 package com.mizhousoft.push.apple.impl;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -93,8 +93,8 @@ public class ApplePushServiceImpl implements ApplePushService
 
 			Set<String> tokens = request.getTokens();
 
-			Set<String> traceIds = new HashSet<>(tokens.size());
-			Set<String> illegalTokens = new HashSet<>(1);
+			Set<String> traceIds = new CopyOnWriteArraySet<>();
+			Set<String> illegalTokens = new CopyOnWriteArraySet<>();
 
 			CountDownLatch countDownLatch = new CountDownLatch(tokens.size());
 
