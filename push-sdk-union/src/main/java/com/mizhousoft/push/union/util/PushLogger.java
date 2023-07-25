@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public abstract class PushLogger
 
 	public static void log(PushProvider provider, NotificationRequest request, PushResult result)
 	{
-		String traceId = result.getTraceId();
+		String traceId = StringUtils.defaultString(result.getTraceId());
 		String channelId = request.getChannelId();
 
 		Set<String> tokens = request.getTokens();

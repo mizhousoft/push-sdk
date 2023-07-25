@@ -133,7 +133,13 @@ public class ApplePushServiceImpl implements ApplePushService
 
 			countDownLatch.await(10, TimeUnit.SECONDS);
 
-			return new PushResult(traceIds.iterator().next(), illegalTokens);
+			String traceId = null;
+			if (!traceIds.isEmpty())
+			{
+				traceId = traceIds.iterator().next();
+			}
+
+			return new PushResult(traceId, illegalTokens);
 		}
 		catch (Exception e)
 		{
