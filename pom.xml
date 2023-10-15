@@ -19,6 +19,7 @@
 	<properties>
 		<commons.version>1.7.0-SNAPSHOT</commons.version>
 		<push.version>1.7.0-SNAPSHOT</push.version>
+		<mizhousoft.boot.version>1.7.0-SNAPSHOT</mizhousoft.boot.version>
 
 		<pushy.version>0.15.2</pushy.version>
 	</properties>
@@ -32,6 +33,7 @@
 		<module>push-sdk-apple</module>
 		<module>push-sdk-union</module>
 		<module>push-sdk-all</module>
+		<module>push-spring-boot-starter</module>
 	</modules>
 
 </project>
