@@ -19,6 +19,7 @@ import com.mizhousoft.push.result.PushResult;
 import com.mizhousoft.push.util.IntentUtils;
 import com.mizhousoft.push.validator.RequestValidator;
 import com.mizhousoft.push.vivo.ViVoAuthService;
+import com.mizhousoft.push.vivo.ViVoMessageCateConverter;
 import com.mizhousoft.push.vivo.ViVoPushService;
 import com.mizhousoft.push.vivo.config.ViVoProfile;
 import com.mizhousoft.push.vivo.constant.ViVoConstants;
@@ -123,9 +124,8 @@ public class ViVoPushServiceImpl implements ViVoPushService
 			unicastPush.setSkipContent(intent);
 		}
 
-		int classification = NotificationType.SYSTEM.equals(request.getNotificationType()) ? ViVoConstants.CLASSIFICATION_SYSTEM
-		        : ViVoConstants.CLASSIFICATION_OPERATION;
-		unicastPush.setClassification(classification);
+		String category = ViVoMessageCateConverter.convert(request.getCategory());
+		unicastPush.setCategory(category);
 
 		try
 		{
@@ -184,6 +184,9 @@ public class ViVoPushServiceImpl implements ViVoPushService
 		int classification = NotificationType.SYSTEM.equals(request.getNotificationType()) ? ViVoConstants.CLASSIFICATION_SYSTEM
 		        : ViVoConstants.CLASSIFICATION_OPERATION;
 		taskRequest.setClassification(classification);
+
+		String category = ViVoMessageCateConverter.convert(request.getCategory());
+		taskRequest.setCategory(category);
 
 		try
 		{

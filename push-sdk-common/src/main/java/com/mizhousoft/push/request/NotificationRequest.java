@@ -15,7 +15,7 @@ import com.mizhousoft.push.action.ClickAction;
 public class NotificationRequest
 {
 	// 设备token, <Token, UserId>
-	private final Map<String, Integer> tokenMap;
+	private Map<String, Integer> tokenMap;
 
 	// 通知栏消息的标题
 	private String title;
@@ -32,6 +32,9 @@ public class NotificationRequest
 	// 通知类型
 	private NotificationType notificationType = NotificationType.SYSTEM;
 
+	// 分类
+	private String category;
+
 	/**
 	 * 构造函数
 	 *
@@ -42,19 +45,17 @@ public class NotificationRequest
 	{
 		super();
 
-		this.tokenMap = new HashMap<>();
+		this.tokenMap = new HashMap<>(1);
 		tokenMap.put(token, userId);
 	}
 
 	/**
 	 * 构造函数
 	 *
-	 * @param tokenMap
 	 */
-	public NotificationRequest(Map<String, Integer> tokenMap)
+	public NotificationRequest()
 	{
 		super();
-		this.tokenMap = tokenMap;
 	}
 
 	/**
@@ -65,6 +66,16 @@ public class NotificationRequest
 	public Map<String, Integer> getTokenMap()
 	{
 		return tokenMap;
+	}
+
+	/**
+	 * 设置tokenMap
+	 * 
+	 * @param tokenMap
+	 */
+	public void setTokenMap(Map<String, Integer> tokenMap)
+	{
+		this.tokenMap = tokenMap;
 	}
 
 	/**
@@ -175,5 +186,25 @@ public class NotificationRequest
 	public void setNotificationType(NotificationType notificationType)
 	{
 		this.notificationType = notificationType;
+	}
+
+	/**
+	 * 获取category
+	 * 
+	 * @return
+	 */
+	public String getCategory()
+	{
+		return category;
+	}
+
+	/**
+	 * 设置category
+	 * 
+	 * @param category
+	 */
+	public void setCategory(String category)
+	{
+		this.category = category;
 	}
 }

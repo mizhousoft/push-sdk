@@ -40,6 +40,47 @@ public interface HuaweiConstants
 	// 点击后打开应用App
 	int CLICK_ACTION_OPEN_APP = 3;
 
+	// -------------------消息类型-------------------
+
+	// 即时聊天
+	String CATEGORY_IM = "IM";
+
+	// 音视频通话
+	String CATEGORY_VOIP = "VOIP";
+
+	// 订阅
+	String CATEGORY_SUBSCRIPTION = "SUBSCRIPTION";
+
+	// 出行
+	String CATEGORY_TRAVEL = "TRAVEL";
+
+	// 健康
+	String CATEGORY_HEALTH = "HEALTH";
+
+	// 工作事项提醒
+	String CATEGORY_WORK = "WORK";
+
+	// 帐号动态
+	String CATEGORY_ACCOUNT = "ACCOUNT";
+
+	// 订单&物流
+	String CATEGORY_EXPRESS = "EXPRESS";
+
+	// 财务
+	String CATEGORY_FINANCE = "FINANCE";
+
+	// 设备提醒
+	String CATEGORY_DEVICE_REMINDER = "DEVICE_REMINDER";
+
+	// 邮件
+	String CATEGORY_MAIL = "MAIL";
+
+	// 语音播报（仅透传消息支持）
+	String CATEGORY_PLAY_VOICE = "PLAY_VOICE";
+
+	// 内容推荐、新闻、财经动态、生活资讯、社交动态、调研、产品促销、功能推荐、运营活动（仅对内容进行标识，不会加快消息发送）
+	String CATEGORY_MARKETING = "MARKETING";
+
 	// -------------------点击通知动作-------------------
 
 	// 默认样式

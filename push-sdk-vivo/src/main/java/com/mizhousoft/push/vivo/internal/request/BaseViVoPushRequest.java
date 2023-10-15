@@ -41,6 +41,9 @@ public class BaseViVoPushRequest
 	// 消息类型 0：运营类消息，1：系统类消息。不填默认为0
 	private Integer classification;
 
+	// 二级分类
+	private String category;
+
 	/**
 	 * 获取notifyType
 	 * 
@@ -239,5 +242,25 @@ public class BaseViVoPushRequest
 	public void setClassification(Integer classification)
 	{
 		this.classification = classification;
+	}
+
+	/**
+	 * 获取category
+	 * 
+	 * @return
+	 */
+	public String getCategory()
+	{
+		return category;
+	}
+
+	/**
+	 * 设置category
+	 * 
+	 * @param category
+	 */
+	public void setCategory(String category)
+	{
+		this.category = category;
 	}
 }
