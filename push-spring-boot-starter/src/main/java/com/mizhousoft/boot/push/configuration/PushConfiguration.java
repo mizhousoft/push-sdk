@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +30,8 @@ import com.mizhousoft.push.union.UnifiedPushService;
 import com.mizhousoft.push.union.impl.UnifiedPushServiceImpl;
 import com.mizhousoft.push.vivo.config.ViVoProfile;
 import com.mizhousoft.push.xiaomi.config.XiaoMiProfile;
+
+import jakarta.annotation.PreDestroy;
 
 /**
  * 配置
