@@ -12,7 +12,6 @@ import org.apache.commons.collections4.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mizhousoft.commons.restclient.service.RestClientService;
 import com.mizhousoft.push.ProviderProfile;
 import com.mizhousoft.push.ProviderPushService;
 import com.mizhousoft.push.PushProvider;
@@ -44,13 +43,13 @@ public class UnifiedPushServiceImpl implements UnifiedPushService
 
 	private Map<PushProvider, ProviderPushService> pushServiceMap = new HashMap<>(5);
 
-	public UnifiedPushServiceImpl(Map<PushProvider, ProviderProfile> profileMap, RestClientService restClientService)
+	public UnifiedPushServiceImpl(Map<PushProvider, ProviderProfile> profileMap)
 	{
 		ProviderProfile hwProfile = profileMap.get(PushProvider.HUAWEI);
 		if (null != hwProfile)
 		{
 			HuaweiProfile profile = (HuaweiProfile) hwProfile;
-			HuaweiPushServiceImpl huaweiPushService = new HuaweiPushServiceImpl(profile, restClientService);
+			HuaweiPushServiceImpl huaweiPushService = new HuaweiPushServiceImpl(profile);
 			pushServiceMap.put(PushProvider.HUAWEI, huaweiPushService);
 
 			LOG.info("Create Huawei push service, app id is {}.", profile.getAppId());
@@ -60,7 +59,7 @@ public class UnifiedPushServiceImpl implements UnifiedPushService
 		if (null != oppoProfile)
 		{
 			OppoProfile profile = (OppoProfile) oppoProfile;
-			OppoPushServiceImpl oppoPushService = new OppoPushServiceImpl(profile, restClientService);
+			OppoPushServiceImpl oppoPushService = new OppoPushServiceImpl(profile);
 			pushServiceMap.put(PushProvider.OPPO, oppoPushService);
 
 			LOG.info("Create Oppo push service, app key is {}.", profile.getAppKey());
@@ -70,7 +69,7 @@ public class UnifiedPushServiceImpl implements UnifiedPushService
 		if (null != vivoProfile)
 		{
 			ViVoProfile profile = (ViVoProfile) vivoProfile;
-			ViVoPushServiceImpl viVoPushService = new ViVoPushServiceImpl(profile, restClientService);
+			ViVoPushServiceImpl viVoPushService = new ViVoPushServiceImpl(profile);
 			pushServiceMap.put(PushProvider.VIVO, viVoPushService);
 
 			LOG.info("Create ViVo push service, app id is {}.", profile.getAppId());
@@ -80,7 +79,7 @@ public class UnifiedPushServiceImpl implements UnifiedPushService
 		if (null != xiaomiProfile)
 		{
 			XiaoMiProfile profile = (XiaoMiProfile) xiaomiProfile;
-			XiaoMiPushServiceImpl xiaoMiPushService = new XiaoMiPushServiceImpl(profile, restClientService);
+			XiaoMiPushServiceImpl xiaoMiPushService = new XiaoMiPushServiceImpl(profile);
 			pushServiceMap.put(PushProvider.XIAOMI, xiaoMiPushService);
 
 			LOG.info("Create Xiaomi push service, app id is {}.", profile.getAppId());

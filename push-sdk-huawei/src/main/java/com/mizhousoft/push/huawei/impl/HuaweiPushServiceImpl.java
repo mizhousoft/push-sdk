@@ -5,13 +5,9 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 import com.mizhousoft.commons.json.JSONException;
 import com.mizhousoft.commons.json.JSONUtils;
-import com.mizhousoft.commons.restclient.service.RestClientService;
 import com.mizhousoft.push.action.ClickAction;
 import com.mizhousoft.push.action.IntentClickAction;
 import com.mizhousoft.push.exception.PushException;
@@ -36,6 +32,9 @@ import com.mizhousoft.push.util.IntentUtils;
 import com.mizhousoft.push.util.PushAsserts;
 import com.mizhousoft.push.validator.RequestValidator;
 
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
+
 /**
  * 推送服务
  *
@@ -48,9 +47,6 @@ public class HuaweiPushServiceImpl implements HuaweiPushService
 	// 凭证
 	private HuaweiProfile profile;
 
-	// REST服务
-	private RestClientService restClientService;
-
 	// HuaweiAuthService
 	private HuaweiAuthService huaweiAuthService;
 
@@ -58,17 +54,14 @@ public class HuaweiPushServiceImpl implements HuaweiPushService
 	 * 构造函数
 	 *
 	 * @param profile
-	 * @param restClientService
 	 */
-	public HuaweiPushServiceImpl(HuaweiProfile profile, RestClientService restClientService)
+	public HuaweiPushServiceImpl(HuaweiProfile profile)
 	{
 		super();
 		this.profile = profile;
-		this.restClientService = restClientService;
 
 		HuaweiAuthServiceImpl huaweiAuthService = new HuaweiAuthServiceImpl();
 		huaweiAuthService.setProfile(this.profile);
-		huaweiAuthService.setRestClientService(this.restClientService);
 		this.huaweiAuthService = huaweiAuthService;
 	}
 
@@ -180,17 +173,12 @@ public class HuaweiPushServiceImpl implements HuaweiPushService
 			HuaweiAccessToken accessToken = huaweiAuthService.getAccessToken();
 			String authorization = accessToken.getTokenType() + " " + accessToken.getAccessToken();
 
-			HttpHeaders headers = new HttpHeaders();
-			MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
-			headers.setContentType(type);
-			headers.add("Authorization", authorization);
-
 			String requestBody = JSONUtils.toJSONString(request);
 
-			HttpEntity<String> httpEntity = new HttpEntity<String>(requestBody, headers);
-
 			String url = String.format(PUSH_URL, profile.getAppId());
-			String responseBody = restClientService.postForObject(url, httpEntity, String.class);
+
+			String responseBody = Unirest.post(url).body(requestBody).header("Authorization", authorization)
+			        .header("Content-Type", "application/json; charset=UTF-8").asString().getBody();
 
 			LOG.info("Push response is {}.", responseBody);
 
@@ -199,6 +187,10 @@ public class HuaweiPushServiceImpl implements HuaweiPushService
 			PushResult pushResult = buildPushResult(request, pushResponse);
 
 			return pushResult;
+		}
+		catch (UnirestException e)
+		{
+			throw new PushException("Request failed.", e);
 		}
 		catch (JSONException e)
 		{

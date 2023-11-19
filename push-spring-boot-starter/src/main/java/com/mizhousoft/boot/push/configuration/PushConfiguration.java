@@ -19,7 +19,6 @@ import com.mizhousoft.boot.push.protperties.HauweiPushProperties;
 import com.mizhousoft.boot.push.protperties.OppoPushProperties;
 import com.mizhousoft.boot.push.protperties.ViVoPushProperties;
 import com.mizhousoft.boot.push.protperties.XiaoMiPushProperties;
-import com.mizhousoft.commons.restclient.service.RestClientService;
 import com.mizhousoft.push.ProviderProfile;
 import com.mizhousoft.push.PushProvider;
 import com.mizhousoft.push.apple.config.AppleProfile;
@@ -63,9 +62,6 @@ public class PushConfiguration
 	private ApplePushProperties applePushProperties;
 
 	@Autowired
-	private RestClientService restClientService;
-
-	@Autowired
 	private ResourceLoader resourceLoader;
 
 	private UnifiedPushService unifiedPushService;
@@ -77,7 +73,7 @@ public class PushConfiguration
 
 		Map<PushProvider, ProviderProfile> profileMap = buildProviderProfileMap();
 
-		UnifiedPushServiceImpl unifiedPushService = new UnifiedPushServiceImpl(profileMap, restClientService);
+		UnifiedPushServiceImpl unifiedPushService = new UnifiedPushServiceImpl(profileMap);
 		unifiedPushService.initialize();
 
 		this.unifiedPushService = unifiedPushService;

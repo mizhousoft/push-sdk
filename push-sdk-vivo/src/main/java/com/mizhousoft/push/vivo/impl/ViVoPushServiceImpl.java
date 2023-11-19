@@ -2,14 +2,10 @@ package com.mizhousoft.push.vivo.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 import com.mizhousoft.commons.crypto.generator.RandomGenerator;
 import com.mizhousoft.commons.json.JSONException;
 import com.mizhousoft.commons.json.JSONUtils;
-import com.mizhousoft.commons.restclient.service.RestClientService;
 import com.mizhousoft.push.NotificationType;
 import com.mizhousoft.push.action.ClickAction;
 import com.mizhousoft.push.action.IntentClickAction;
@@ -30,6 +26,9 @@ import com.mizhousoft.push.vivo.internal.response.ViVoBroadcastPushResponse;
 import com.mizhousoft.push.vivo.internal.response.ViVoBroadcastTaskResponse;
 import com.mizhousoft.push.vivo.internal.response.ViVoUnicastPushResponse;
 
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
+
 /**
  * 推送服务
  *
@@ -42,9 +41,6 @@ public class ViVoPushServiceImpl implements ViVoPushService
 	// 凭证
 	private ViVoProfile profile;
 
-	// REST服务
-	private RestClientService restClientService;
-
 	// ViVoAuthService
 	private ViVoAuthService vivoAuthService;
 
@@ -52,17 +48,14 @@ public class ViVoPushServiceImpl implements ViVoPushService
 	 * 构造函数
 	 *
 	 * @param profile
-	 * @param restClientService
 	 */
-	public ViVoPushServiceImpl(ViVoProfile profile, RestClientService restClientService)
+	public ViVoPushServiceImpl(ViVoProfile profile)
 	{
 		super();
 		this.profile = profile;
-		this.restClientService = restClientService;
 
 		ViVoAuthServiceImpl vivoAuthService = new ViVoAuthServiceImpl();
 		vivoAuthService.setProfile(this.profile);
-		vivoAuthService.setRestClientService(this.restClientService);
 		this.vivoAuthService = vivoAuthService;
 	}
 
@@ -131,16 +124,10 @@ public class ViVoPushServiceImpl implements ViVoPushService
 		{
 			String accessToken = vivoAuthService.getAccessToken();
 
-			HttpHeaders headers = new HttpHeaders();
-			MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
-			headers.setContentType(type);
-			headers.add("authToken", accessToken);
-
 			String body = JSONUtils.toJSONString(unicastPush);
 
-			HttpEntity<String> httpEntity = new HttpEntity<String>(body, headers);
-
-			String responseBody = restClientService.postForObject(UNICAST_PUSH_URL, httpEntity, String.class);
+			String responseBody = Unirest.post(UNICAST_PUSH_URL).header("authToken", accessToken)
+			        .header("Content-Type", "application/json; charset=UTF-8").body(body).asString().getBody();
 
 			LOG.info("Push response is {}.", responseBody);
 
@@ -155,6 +142,10 @@ public class ViVoPushServiceImpl implements ViVoPushService
 			}
 
 			return new PushResult(response.getTaskId());
+		}
+		catch (UnirestException e)
+		{
+			throw new PushException("Request failed.", e);
 		}
 		catch (JSONException e)
 		{
@@ -192,15 +183,10 @@ public class ViVoPushServiceImpl implements ViVoPushService
 		{
 			String accessToken = vivoAuthService.getAccessToken();
 
-			HttpHeaders headers = new HttpHeaders();
-			MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
-			headers.setContentType(type);
-			headers.add("authToken", accessToken);
-
 			String body = JSONUtils.toJSONString(taskRequest);
-			HttpEntity<String> httpEntity = new HttpEntity<String>(body, headers);
 
-			String responseBody = restClientService.postForObject(BROADCAST_TASK_URL, httpEntity, String.class);
+			String responseBody = Unirest.post(BROADCAST_TASK_URL).header("authToken", accessToken)
+			        .header("Content-Type", "application/json; charset=UTF-8").body(body).asString().getBody();
 
 			LOG.info("Push response is {}.", responseBody);
 
@@ -217,9 +203,9 @@ public class ViVoPushServiceImpl implements ViVoPushService
 			pushRequest.setTaskId(taskResponse.getTaskId());
 
 			body = JSONUtils.toJSONString(pushRequest);
-			httpEntity = new HttpEntity<String>(body, headers);
 
-			responseBody = restClientService.postForObject(BROADCAST_PUSH_URL, httpEntity, String.class);
+			responseBody = Unirest.post(BROADCAST_PUSH_URL).header("authToken", accessToken)
+			        .header("Content-Type", "application/json; charset=UTF-8").body(body).asString().getBody();
 
 			LOG.info("Push response is {}.", responseBody);
 
@@ -234,6 +220,10 @@ public class ViVoPushServiceImpl implements ViVoPushService
 			}
 
 			return new PushResult(taskResponse.getTaskId());
+		}
+		catch (UnirestException e)
+		{
+			throw new PushException("Request failed.", e);
 		}
 		catch (JSONException e)
 		{

@@ -1,19 +1,15 @@
 package com.mizhousoft.push.xiaomi.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import com.mizhousoft.commons.json.JSONException;
 import com.mizhousoft.commons.json.JSONUtils;
-import com.mizhousoft.commons.restclient.service.RestClientService;
 import com.mizhousoft.push.action.ClickAction;
 import com.mizhousoft.push.action.IntentClickAction;
 import com.mizhousoft.push.exception.PushException;
@@ -28,6 +24,9 @@ import com.mizhousoft.push.xiaomi.internal.request.MiMessageExtra;
 import com.mizhousoft.push.xiaomi.internal.request.MiMessageRequest;
 import com.mizhousoft.push.xiaomi.internal.response.MiMessagePushResponse;
 
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
+
 /**
  * 小米推送服务
  *
@@ -40,9 +39,6 @@ public class XiaoMiPushServiceImpl implements XiaoMiPushService
 	// 凭证
 	private XiaoMiProfile profile;
 
-	// REST服务
-	private RestClientService restClientService;
-
 	// 通知ID
 	private AtomicInteger notifyId = new AtomicInteger(1);
 
@@ -50,13 +46,11 @@ public class XiaoMiPushServiceImpl implements XiaoMiPushService
 	 * 构造函数
 	 *
 	 * @param profile
-	 * @param restClientService
 	 */
-	public XiaoMiPushServiceImpl(XiaoMiProfile profile, RestClientService restClientService)
+	public XiaoMiPushServiceImpl(XiaoMiProfile profile)
 	{
 		super();
 		this.profile = profile;
-		this.restClientService = restClientService;
 	}
 
 	/**
@@ -82,16 +76,9 @@ public class XiaoMiPushServiceImpl implements XiaoMiPushService
 		{
 			String authorization = "key=" + profile.getAppSecret();
 
-			HttpHeaders headers = new HttpHeaders();
-			MediaType type = MediaType.parseMediaType("application/x-www-form-urlencoded;charset=UTF-8");
-			headers.setContentType(type);
-			headers.add("Authorization", authorization);
+			Map<String, Object> formData = buildFormData(messageRequest);
 
-			MultiValueMap<String, Object> formData = buildFormData(messageRequest);
-
-			HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(formData, headers);
-
-			String response = restClientService.postForObject(PUSH_URL, httpEntity, String.class);
+			String response = Unirest.post(PUSH_URL).header("Authorization", authorization).fields(formData).asString().getBody();
 
 			LOG.info("Push response is {}.", response);
 
@@ -107,6 +94,10 @@ public class XiaoMiPushServiceImpl implements XiaoMiPushService
 			}
 
 			return new PushResult(pushResponse.getTraceId(), pushResponse.getIllegalTokens());
+		}
+		catch (UnirestException e)
+		{
+			throw new PushException("Request failed.", e);
 		}
 		catch (JSONException e)
 		{
@@ -142,21 +133,21 @@ public class XiaoMiPushServiceImpl implements XiaoMiPushService
 		return messageRequest;
 	}
 
-	private MultiValueMap<String, Object> buildFormData(MiMessageRequest request)
+	private Map<String, Object> buildFormData(MiMessageRequest request)
 	{
-		MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>(20);
-		formData.add(MiMessageRequest.RESTRICTED_PACKAGE_NAME, request.getRestrictedPackageNames());
-		formData.add(MiMessageRequest.PASS_THROUGH, request.getPassThrough());
-		formData.add(MiMessageRequest.TITLE, request.getTitle());
-		formData.add(MiMessageRequest.DESCRIPTION, request.getDescription());
-		formData.add(MiMessageRequest.NOTIFY_TYPE, request.getNotifyType());
-		formData.add(MiMessageRequest.REGISTRATION_ID, request.getRegId());
-		formData.add(MiMessageRequest.NOTIFY_ID, request.getNotifyId());
+		Map<String, Object> formData = new HashMap<>(20);
+		formData.put(MiMessageRequest.RESTRICTED_PACKAGE_NAME, request.getRestrictedPackageNames());
+		formData.put(MiMessageRequest.PASS_THROUGH, request.getPassThrough());
+		formData.put(MiMessageRequest.TITLE, request.getTitle());
+		formData.put(MiMessageRequest.DESCRIPTION, request.getDescription());
+		formData.put(MiMessageRequest.NOTIFY_TYPE, request.getNotifyType());
+		formData.put(MiMessageRequest.REGISTRATION_ID, request.getRegId());
+		formData.put(MiMessageRequest.NOTIFY_ID, request.getNotifyId());
 
 		MiMessageExtra extra = request.getExtra();
-		formData.add(MiMessageExtra.NOTIFY_EFFECT, extra.getEffect());
-		formData.add(MiMessageExtra.INTENT_URI, extra.getIntentUri());
-		formData.add(MiMessageExtra.NOTIFY_FOREGROUND, extra.getForeground());
+		formData.put(MiMessageExtra.NOTIFY_EFFECT, extra.getEffect());
+		formData.put(MiMessageExtra.INTENT_URI, extra.getIntentUri());
+		formData.put(MiMessageExtra.NOTIFY_FOREGROUND, extra.getForeground());
 
 		return formData;
 	}

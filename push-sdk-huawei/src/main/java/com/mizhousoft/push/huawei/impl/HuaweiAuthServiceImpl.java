@@ -1,18 +1,19 @@
 package com.mizhousoft.push.huawei.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import com.mizhousoft.commons.json.JSONException;
 import com.mizhousoft.commons.json.JSONUtils;
-import com.mizhousoft.commons.restclient.service.RestClientService;
 import com.mizhousoft.push.exception.PushException;
 import com.mizhousoft.push.huawei.HuaweiAccessToken;
 import com.mizhousoft.push.huawei.HuaweiAuthService;
 import com.mizhousoft.push.huawei.config.HuaweiProfile;
+
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 
 /**
  * 认证服务
@@ -23,9 +24,6 @@ public class HuaweiAuthServiceImpl implements HuaweiAuthService
 {
 	// 凭证
 	private HuaweiProfile profile;
-
-	// REST服务
-	private RestClientService restClientService;
 
 	// 访问Token
 	private volatile HuaweiAccessToken accessToken;
@@ -38,19 +36,15 @@ public class HuaweiAuthServiceImpl implements HuaweiAuthService
 	{
 		if (isAccessTokenExpired())
 		{
-			MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
-			postParameters.add("grant_type", "client_credentials");
-			postParameters.add("client_id", profile.getAppId());
-			postParameters.add("client_secret", profile.getAppSecret());
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.add("Content-Type", "application/x-www-form-urlencoded");
-			HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(postParameters, headers);
-
-			String responseBody = restClientService.postForObject(OAUTH2_TOKEN_URL, entity, String.class);
+			Map<String, Object> postParameters = new HashMap<>(3);
+			postParameters.put("grant_type", "client_credentials");
+			postParameters.put("client_id", profile.getAppId());
+			postParameters.put("client_secret", profile.getAppSecret());
 
 			try
 			{
+				String responseBody = Unirest.post(OAUTH2_TOKEN_URL).fields(postParameters).asString().getBody();
+
 				HuaweiAccessToken hwAccessToken = JSONUtils.parse(responseBody, HuaweiAccessToken.class);
 
 				if (!StringUtils.isBlank(hwAccessToken.getError()))
@@ -62,6 +56,10 @@ public class HuaweiAuthServiceImpl implements HuaweiAuthService
 				hwAccessToken.setExpiresIn(expiresTime);
 
 				this.accessToken = hwAccessToken;
+			}
+			catch (UnirestException e)
+			{
+				throw new PushException(e.getMessage(), e);
 			}
 			catch (JSONException e)
 			{
@@ -90,15 +88,5 @@ public class HuaweiAuthServiceImpl implements HuaweiAuthService
 	public void setProfile(HuaweiProfile profile)
 	{
 		this.profile = profile;
-	}
-
-	/**
-	 * 设置restClientService
-	 * 
-	 * @param restClientService
-	 */
-	public void setRestClientService(RestClientService restClientService)
-	{
-		this.restClientService = restClientService;
 	}
 }

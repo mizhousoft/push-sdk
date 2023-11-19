@@ -18,13 +18,12 @@
 			<version>${push.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.mizhousoft.boot</groupId>
-			<artifactId>restclient-spring-boot-starter</artifactId>
-			<version>${mizhousoft.boot.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

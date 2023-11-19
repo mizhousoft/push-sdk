@@ -9,12 +9,14 @@ import org.apache.commons.codec.digest.DigestUtils;
 import com.mizhousoft.commons.json.JSONException;
 import com.mizhousoft.commons.json.JSONUtils;
 import com.mizhousoft.commons.lang.CharEncoding;
-import com.mizhousoft.commons.restclient.service.RestClientService;
 import com.mizhousoft.push.exception.PushException;
 import com.mizhousoft.push.vivo.ViVoAuthService;
 import com.mizhousoft.push.vivo.ViVoResultCodeMap;
 import com.mizhousoft.push.vivo.config.ViVoProfile;
 import com.mizhousoft.push.vivo.internal.response.ViVoAccessTokenResponse;
+
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 
 /**
  * ViVo认证服务
@@ -25,9 +27,6 @@ public class ViVoAuthServiceImpl implements ViVoAuthService
 {
 	// 凭证
 	private ViVoProfile profile;
-
-	// REST服务
-	private RestClientService restClientService;
 
 	// 访问Token
 	private volatile String accessToken;
@@ -56,7 +55,7 @@ public class ViVoAuthServiceImpl implements ViVoAuthService
 				requestMap.put("timestamp", timestamp);
 				requestMap.put("sign", sign);
 
-				String responseBody = restClientService.postForObject(AUTH_URL, requestMap, String.class);
+				String responseBody = Unirest.post(AUTH_URL).body(requestMap).asString().getBody();
 
 				ViVoAccessTokenResponse tokenResponse = JSONUtils.parse(responseBody, ViVoAccessTokenResponse.class);
 
@@ -68,6 +67,10 @@ public class ViVoAuthServiceImpl implements ViVoAuthService
 
 				this.accessToken = tokenResponse.getAuthToken();
 				this.expiresTime = System.currentTimeMillis() + (2 * 60 * 60 - 200) * 1000L;
+			}
+			catch (UnirestException e)
+			{
+				throw new PushException("Request failed.", e);
 			}
 			catch (JSONException e)
 			{
@@ -98,13 +101,4 @@ public class ViVoAuthServiceImpl implements ViVoAuthService
 		this.profile = profile;
 	}
 
-	/**
-	 * 设置restClientService
-	 * 
-	 * @param restClientService
-	 */
-	public void setRestClientService(RestClientService restClientService)
-	{
-		this.restClientService = restClientService;
-	}
 }

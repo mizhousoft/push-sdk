@@ -9,16 +9,10 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.mizhousoft.commons.json.JSONException;
 import com.mizhousoft.commons.json.JSONUtils;
-import com.mizhousoft.commons.restclient.service.RestClientService;
 import com.mizhousoft.push.action.ClickAction;
 import com.mizhousoft.push.action.IntentClickAction;
 import com.mizhousoft.push.exception.PushException;
@@ -38,6 +32,9 @@ import com.mizhousoft.push.result.PushResult;
 import com.mizhousoft.push.util.IntentUtils;
 import com.mizhousoft.push.validator.RequestValidator;
 
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
+
 /**
  * 推送服务
  *
@@ -50,9 +47,6 @@ public class OppoPushServiceImpl implements OppoPushService
 	// 凭证
 	private OppoProfile profile;
 
-	// REST服务
-	private RestClientService restClientService;
-
 	// OppoAuthService
 	private OppoAuthService oppoAuthService;
 
@@ -60,15 +54,13 @@ public class OppoPushServiceImpl implements OppoPushService
 	 * 构造函数
 	 *
 	 * @param profile
-	 * @param restClientService
 	 */
-	public OppoPushServiceImpl(OppoProfile profile, RestClientService restClientService)
+	public OppoPushServiceImpl(OppoProfile profile)
 	{
 		super();
 		this.profile = profile;
-		this.restClientService = restClientService;
 
-		this.oppoAuthService = new OppoAuthServiceImpl(profile, restClientService);
+		this.oppoAuthService = new OppoAuthServiceImpl(profile);
 	}
 
 	/**
@@ -122,17 +114,11 @@ public class OppoPushServiceImpl implements OppoPushService
 
 			OppoAccessToken accessToken = oppoAuthService.getAccessToken();
 
-			HttpHeaders headers = new HttpHeaders();
-			MediaType type = MediaType.parseMediaType("application/x-www-form-urlencoded");
-			headers.setContentType(type);
+			Map<String, Object> formData = new HashMap<>(2);
+			formData.put(OppoConstants.PARAM_MESSAGE, message);
+			formData.put(OppoConstants.PARAM_TOKEN, accessToken.getAuthToken());
 
-			MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>(20);
-			formData.add(OppoConstants.PARAM_MESSAGE, message);
-			formData.add(OppoConstants.PARAM_TOKEN, accessToken.getAuthToken());
-
-			HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(formData, headers);
-
-			String responseBody = restClientService.postForObject(UNICAST_PUSH_URL, httpEntity, String.class);
+			String responseBody = Unirest.post(UNICAST_PUSH_URL).fields(formData).asString().getBody();
 
 			LOG.info("Push response is {}.", responseBody);
 
@@ -153,6 +139,10 @@ public class OppoPushServiceImpl implements OppoPushService
 			String requestId = response.getData().getMessageId();
 			return new PushResult(requestId);
 		}
+		catch (UnirestException e)
+		{
+			throw new PushException("Request failed.", e);
+		}
 		catch (JSONException e)
 		{
 			throw new PushException("Serialize object is null.", e);
@@ -169,23 +159,17 @@ public class OppoPushServiceImpl implements OppoPushService
 		{
 			OppoAccessToken accessToken = oppoAuthService.getAccessToken();
 
-			HttpHeaders headers = new HttpHeaders();
-			MediaType type = MediaType.parseMediaType("application/x-www-form-urlencoded");
-			headers.setContentType(type);
-
-			MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>(20);
-			formData.add(OppoConstants.PARAM_TOKEN, accessToken.getAuthToken());
+			Map<String, Object> formData = new HashMap<>(20);
+			formData.put(OppoConstants.PARAM_TOKEN, accessToken.getAuthToken());
 
 			Iterator<Entry<String, Object>> iter = notificationParams.entrySet().iterator();
 			while (iter.hasNext())
 			{
 				Entry<String, Object> entry = iter.next();
-				formData.add(entry.getKey(), entry.getValue());
+				formData.put(entry.getKey(), entry.getValue());
 			}
 
-			HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(formData, headers);
-
-			String responseBody = restClientService.postForObject(BROADCAST_TASK_URL, httpEntity, String.class);
+			String responseBody = Unirest.post(BROADCAST_TASK_URL).fields(formData).asString().getBody();
 
 			LOG.info("Push response is {}.", responseBody);
 
@@ -200,15 +184,13 @@ public class OppoPushServiceImpl implements OppoPushService
 
 			String targetValue = StringUtils.join(request.getTokens(), ";");
 
-			formData = new LinkedMultiValueMap<>(20);
-			formData.add(OppoConstants.PARAM_TOKEN, accessToken.getAuthToken());
-			formData.add(OppoConstants.PARAM_TARGET_TYPE, OppoConstants.TARGET_TYPE_REGISTRATION_ID);
-			formData.add(OppoConstants.PARAM_TARGET_VALUE, targetValue);
-			formData.add(OppoConstants.PARAM_MESSAGE_ID, taskResponse.getData().getMessageId());
+			formData = new HashMap<>(20);
+			formData.put(OppoConstants.PARAM_TOKEN, accessToken.getAuthToken());
+			formData.put(OppoConstants.PARAM_TARGET_TYPE, OppoConstants.TARGET_TYPE_REGISTRATION_ID);
+			formData.put(OppoConstants.PARAM_TARGET_VALUE, targetValue);
+			formData.put(OppoConstants.PARAM_MESSAGE_ID, taskResponse.getData().getMessageId());
 
-			httpEntity = new HttpEntity<>(formData, headers);
-
-			responseBody = restClientService.postForObject(BROADCAST_PUSH_URL, httpEntity, String.class);
+			responseBody = Unirest.post(BROADCAST_PUSH_URL).fields(formData).asString().getBody();
 
 			OppoGenericResponse<BroadcastPushResponse> pushResponse = JSONUtils.parse(responseBody,
 			        new TypeReference<OppoGenericResponse<BroadcastPushResponse>>()
@@ -225,6 +207,10 @@ public class OppoPushServiceImpl implements OppoPushService
 			Set<String> illegalTokens = dataResponse.getInvalidTokens();
 
 			return new PushResult(dataResponse.getMessageId(), illegalTokens);
+		}
+		catch (UnirestException e)
+		{
+			throw new PushException("Request failed.", e);
 		}
 		catch (JSONException e)
 		{
