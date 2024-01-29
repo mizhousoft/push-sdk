@@ -27,7 +27,6 @@
 		<dependency>
 			<groupId>com.eatthepath</groupId>
 			<artifactId>pushy</artifactId>
-			<version>${pushy.version}</version>
 		</dependency>
 	</dependencies>
 
