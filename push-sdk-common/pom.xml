@@ -42,7 +42,7 @@
 	    </dependency>
 	    <dependency>
 	        <groupId>com.konghq</groupId>
-	        <artifactId>unirest-objectmapper-jackson</artifactId>
+	        <artifactId>unirest-modules-jackson</artifactId>
 	    </dependency>
 	</dependencies>
 
