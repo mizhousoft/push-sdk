@@ -17,9 +17,9 @@
 	<description>Push SDK</description>
 
 	<properties>
-		<commons.version>2.0.0</commons.version>
-		<push.version>2.0.0</push.version>
-		<mizhousoft.boot.version>2.0.0</mizhousoft.boot.version>
+		<commons.version>2.0.1-SNAPSHOT</commons.version>
+		<push.version>2.0.1-SNAPSHOT</push.version>
+		<mizhousoft.boot.version>2.0.1-SNAPSHOT</mizhousoft.boot.version>
 	</properties>
 
 	<modules>
