@@ -6,20 +6,20 @@
 	<parent>
 		<groupId>com.mizhousoft</groupId>
 		<artifactId>mizhousoft-bom</artifactId>
-		<version>2.0.1</version>
+		<version>2.0.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.mizhousoft.sdk</groupId>
 	<artifactId>push-sdk</artifactId>
-	<version>2.0.1</version>
+	<version>2.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>push-sdk</name>
 	<description>Push SDK</description>
 
 	<properties>
-		<commons.version>2.0.1</commons.version>
-		<push.version>2.0.1</push.version>
-		<mizhousoft.boot.version>2.0.1</mizhousoft.boot.version>
+		<commons.version>2.0.2-SNAPSHOT</commons.version>
+		<push.version>2.0.2-SNAPSHOT</push.version>
+		<mizhousoft.boot.version>2.0.2-SNAPSHOT</mizhousoft.boot.version>
 	</properties>
 
 	<modules>
