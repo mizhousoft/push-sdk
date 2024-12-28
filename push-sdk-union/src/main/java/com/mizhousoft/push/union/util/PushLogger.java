@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mizhousoft.commons.lang.SetUtils;
 import com.mizhousoft.push.PushProvider;
 import com.mizhousoft.push.request.NotificationRequest;
 import com.mizhousoft.push.result.PushResult;
