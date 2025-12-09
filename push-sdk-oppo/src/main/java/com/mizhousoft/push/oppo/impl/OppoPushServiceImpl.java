@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.mizhousoft.commons.json.JSONException;
 import com.mizhousoft.commons.json.JSONUtils;
 import com.mizhousoft.push.action.ClickAction;
@@ -34,6 +33,7 @@ import com.mizhousoft.push.validator.RequestValidator;
 
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * 推送服务

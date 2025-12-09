@@ -3,7 +3,6 @@ package com.mizhousoft.push.oppo.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.mizhousoft.commons.crypto.CryptoException;
 import com.mizhousoft.commons.crypto.digest.SHA256Digest;
 import com.mizhousoft.commons.json.JSONException;
@@ -18,6 +17,7 @@ import com.mizhousoft.push.oppo.config.OppoProfile;
 
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * 认证服务
